@@ -36,6 +36,7 @@ namespace abobaAPP
             using (var db = new user25Entities())
             {
                 List<OrderProduct> orderProducts;
+                SystemContext.bucketList.Clear();
                 try
                 {
                     IEnumerable<OrderProduct> orderProductSet = (from p in db.OrderProduct select p);
@@ -137,7 +138,7 @@ namespace abobaAPP
                 Product product = (from p in db.Product where p.ProductID == id select p).FirstOrDefault();
                 if (MessageBox.Show($"Удалить выбранный вами продукт: '{product.ProductName}' из корзины?", "Удаление из корзины", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
-                    db.Product.Remove(product);
+                    db.OrderProduct.Remove((from op in db.OrderProduct where op.ProductID == product.ProductID select op).FirstOrDefault());
                     db.SaveChanges();
                     SystemContext.bucketList.Remove(SystemContext.bucketList.Single(p => p.ProductID == id));
                     LoadComponents();

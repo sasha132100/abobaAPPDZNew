@@ -62,7 +62,19 @@ namespace abobaAPP
                             myOrdersButton.Visibility = Visibility.Hidden;
                     }
                     else
+                    {
                         myOrdersButton.Visibility = Visibility.Hidden;
+                        Order order = new Order();
+                        order.OrderStatusID = 1;
+                        order.PickupPointID = 18;
+                        order.OrderCreateDate = DateTime.Now;
+                        order.OrderDeliveryDate = DateTime.Now;
+                        order.UserID = null;
+                        order.OrderGetCode = (from o in db.Order select o).LastOrDefault().OrderGetCode + 1;
+                        db.Order.Add(order);
+                        db.SaveChanges();
+                        SystemContext.Order = (from o in db.Order where o.OrderGetCode == order.OrderGetCode select o).FirstOrDefault();
+                    }    
                 }
                 else
                 {
@@ -77,7 +89,19 @@ namespace abobaAPP
                             myOrdersButton.Visibility = Visibility.Hidden;
                     }
                     else
+                    {
                         myOrdersButton.Visibility = Visibility.Hidden;
+                        Order order = new Order();
+                        order.OrderStatusID = 1;
+                        order.PickupPointID = 18;
+                        order.OrderCreateDate = DateTime.Now;
+                        order.OrderDeliveryDate = DateTime.Now;
+                        order.UserID = SystemContext.user.UserID;
+                        order.OrderGetCode = db.Order.OrderByDescending(o => o.OrderID).FirstOrDefault().OrderGetCode + 1;
+                        db.Order.Add(order);
+                        db.SaveChanges();
+                        SystemContext.Order = (from o in db.Order where o.OrderGetCode == order.OrderGetCode select o).FirstOrDefault();
+                    }
                 }
             }
         }
@@ -194,12 +218,18 @@ namespace abobaAPP
                 Product product = (from p in db.Product where p.ProductID == id select p).FirstOrDefault();
                 if (MessageBox.Show($"Добавить выбранный вами продукт: '{product.ProductName}' в корзину?", "Добавление в корзину", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
-                    SystemContext.bucketList.Add(product);
+                    OrderProduct orderProduct = new OrderProduct();
+                    orderProduct.ProductID = product.ProductID;
+                    orderProduct.OrderID = SystemContext.Order.OrderID;
+                    orderProduct.Count = 1;
+                    db.OrderProduct.Add(orderProduct);
+                    db.SaveChanges();
                 }
+                if ((from op in db.OrderProduct where SystemContext.Order.OrderID == op.OrderID select op).FirstOrDefault() != null)
+                    myOrdersButton.Visibility = Visibility.Visible;
             }
-            if (SystemContext.bucketList.Count > 0)
-                myOrdersButton.Visibility = Visibility.Visible;
         }
+            
 
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
