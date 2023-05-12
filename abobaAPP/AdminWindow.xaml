@@ -1,0 +1,28 @@
+﻿<Window x:Class="abobaAPP.AdminWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AdminWindow" Height="800" Width="1600" MinHeight="800" MinWidth="1600">
+    <Grid>
+        <StackPanel>
+            <Grid Height="30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Name="backButton" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Height="20" Margin="5,0,0,0" Content="Назад" Click="backButton_Click"/>
+                <TextBlock Name="userNameTextBlock"  Grid.Column="2" FontFamily="Verdana" FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+                <Button Name="myOrdersButton"  Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Width="150" Height="20" Margin="0,0,0,0" Content="Заказы" Click="myOrdersButton_Click"/>
+                <TextBlock Text="поиск:" Grid.Column="1" FontFamily="Verdana" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,150,2" Width="Auto" Height="Auto"/>
+                <TextBox Name="searchingBox" Grid.Column="1" Height="25" Width="220" FontFamily="Verdana" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" Margin="150,0,0,0" Foreground="Gray" TextChanged="searchingBox_TextChanged"/>
+                <ComboBox Name="discountComboBox"  Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150" Height="20" Margin="80,0,0,0" SelectionChanged="discount_SelectionChanged"/>
+            </Grid>
+        </StackPanel>
+        <ScrollViewer Margin="0,30,0,30">
+            <StackPanel x:Name="productViewer"/>
+        </ScrollViewer>
+        <Grid VerticalAlignment="Bottom" Height="30">
+            <Button Name="addNewProductButton" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150" Height="20" Margin="5,0,0,0" Content="Добавить новый товар" Click="addNewProductButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>
