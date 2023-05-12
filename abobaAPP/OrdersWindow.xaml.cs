@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,8 +35,15 @@ namespace abobaAPP
             productViewer.Children.Clear();
             using (var db = new user25Entities())
             {
+                List<OrderProduct> orderProducts;
                 try
                 {
+                    IEnumerable<OrderProduct> orderProductSet = (from p in db.OrderProduct select p);
+                    orderProducts = orderProductSet.Where(orderProduct => orderProduct.OrderID.ToString().Contains(SystemContext.Order.OrderID.ToString())).ToList<OrderProduct>();
+                    foreach (var product in orderProducts)
+                    {
+                        SystemContext.bucketList.Add((from p in db.Product where product.ProductID == p.ProductID select p).FirstOrDefault());
+                    }
                     foreach (var product in SystemContext.bucketList)
                     {
                         ProductManufacturer productManufacturer = new ProductManufacturer();
@@ -47,7 +55,6 @@ namespace abobaAPP
                 {
                     MessageBox.Show("Ошибка2");
                 }
-
             }
         }
 
@@ -128,11 +135,13 @@ namespace abobaAPP
             {
                 int id = Convert.ToInt32((sender as Grid).Tag.ToString());
                 Product product = (from p in db.Product where p.ProductID == id select p).FirstOrDefault();
-                if (MessageBox.Show($"Удалить выбранный вами продукт: '{product.ProductName}' из корзины?", "Добавление в корзину", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                if (MessageBox.Show($"Удалить выбранный вами продукт: '{product.ProductName}' из корзины?", "Удаление из корзины", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
+                    db.Product.Remove(product);
+                    db.SaveChanges();
                     SystemContext.bucketList.Remove(SystemContext.bucketList.Single(p => p.ProductID == id));
-                    SystemContext.countInBucket -= 1;
                     LoadComponents();
+                    MessageBox.Show("Удаление прошло успешно!");
                 }
             }
         }
@@ -144,9 +153,43 @@ namespace abobaAPP
             clientWindow.ShowDialog();
         }
 
-        private void createNewOrderButton_Click(object sender, RoutedEventArgs e)
+        private void createNewOrderTalonButton_Click(object sender, RoutedEventArgs e)
         {
+            var order = SystemContext.Order;
+            var app = new Microsoft.Office.Interop.Excel.Application
+            {
+                SheetsInNewWorkbook = 1
+            };
 
+            var workbook = app.Workbooks.Add(Type.Missing);
+
+            Microsoft.Office.Interop.Excel.Worksheet worksheet = app.Worksheets.Item[1];
+            worksheet.Name = "Card";
+
+            worksheet.Cells[1][1] = "Order number";
+            worksheet.Cells[1][2] = "Product list";
+            worksheet.Cells[1][2] = "Product list";
+            worksheet.Cells[1][3] = "Total cost";
+
+            worksheet.Cells[2][1] = order.OrderID;
+
+            var fullProductList = string.Empty;
+            fullProductList = order.OrderProduct.Aggregate(fullProductList,
+                (current, product) => current + $"{product.Product.ProductName}\n");
+            worksheet.Cells[2][2] = fullProductList;
+            worksheet.Cells[2][3] = order.OrderProduct.Sum(p => p.Product.ProductCost);
+
+            worksheet.Columns.AutoFit();
+
+            app.Visible = true;
+
+            app.Application.ActiveWorkbook.SaveAs(@"C:\Users\sasha\Downloads\abobaAPP-master (2)\abobaAPP-master\test.xlsx");
+
+            var excelDocument = app.Workbooks.Open(@"C:\Users\sasha\Downloads\abobaAPP-master (2)\abobaAPP-master\test.xlsx");
+
+            excelDocument.ExportAsFixedFormat(Microsoft.Office.Interop.Excel.XlFixedFormatType.xlTypePDF, @"C:\Users\sasha\Downloads\abobaAPP-master (2)\abobaAPP-master\test.pdf");
+            excelDocument.Close(false, "", false);
+            app.Quit();
         }
     }
 }

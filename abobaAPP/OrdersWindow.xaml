@@ -20,7 +20,7 @@
             <StackPanel x:Name="productViewer"/>
         </ScrollViewer>
         <Grid VerticalAlignment="Bottom" Height="30">
-            <Button Name="createNewOrderButton" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150" Height="20" Margin="5,0,0,0" Content="Сформировать заказ" Click="createNewOrderButton_Click"/>
+            <Button Name="createNewOrderTalonButton" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150" Height="20" Margin="5,0,0,0" Content="Сформировать талон" Click="createNewOrderTalonButton_Click"/>
         </Grid>
     </Grid>
 </Window>

@@ -26,10 +26,11 @@ namespace abobaAPP
             LoadComboBox();
             discountComboBox.SelectedItem = "Показать все";
             initializeProducts("No");
-            if (SystemContext.countInBucket > 0)
+            CheckOutCountInOrder();
+            /*if (SystemContext.countInBucket > 0)
                 myOrdersButton.Visibility = Visibility.Visible;
             else
-                myOrdersButton.Visibility = Visibility.Hidden;
+                myOrdersButton.Visibility = Visibility.Hidden;*/
             if (!SystemContext.isGuest)
                 userNameTextBlock.Text = SystemContext.user.UserLogin;
             else
@@ -42,6 +43,43 @@ namespace abobaAPP
             discountComboBox.Items.Add("Скидка 10-14.99%");
             discountComboBox.Items.Add("Скидка 15 и выше");
             discountComboBox.Items.Add("Показать все");
+        }
+
+        private void CheckOutCountInOrder()
+        {
+            using (var db = new user25Entities())
+            {
+                if (SystemContext.isGuest)
+                {
+                    if ((from o in db.Order where o.UserID == null select o).FirstOrDefault() != null)
+                    {
+                        SystemContext.Order = (from o in db.Order where o.UserID == null select o).FirstOrDefault();
+                        if ((from op in db.OrderProduct where SystemContext.Order.OrderID == op.OrderID select op).FirstOrDefault() != null)
+                        {
+                            myOrdersButton.Visibility = Visibility.Visible;
+                        }
+                        else
+                            myOrdersButton.Visibility = Visibility.Hidden;
+                    }
+                    else
+                        myOrdersButton.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    if ((from o in db.Order where SystemContext.user.UserID == o.UserID select o).FirstOrDefault() != null)
+                    {
+                        SystemContext.Order = (from o in db.Order where SystemContext.user.UserID == o.UserID select o).FirstOrDefault();
+                        if ((from op in db.OrderProduct where SystemContext.Order.OrderID == op.OrderID select op).FirstOrDefault() != null)
+                        {
+                            myOrdersButton.Visibility = Visibility.Visible;
+                        }
+                        else
+                            myOrdersButton.Visibility = Visibility.Hidden;
+                    }
+                    else
+                        myOrdersButton.Visibility = Visibility.Hidden;
+                }
+            }
         }
 
         private void initializeProducts(string isChanged)
@@ -57,7 +95,7 @@ namespace abobaAPP
                     else
                     {
                         IEnumerable<Product> productSet = (from p in db.Product select p);
-                        products = productSet.Where(user => user.ProductName.Contains($"{searchingBox.Text}")).ToList<Product>();
+                        products = productSet.Where(product => product.ProductName.Contains($"{searchingBox.Text}")).ToList<Product>();
                     }
                     foreach (var product in products)
                     {
@@ -157,10 +195,9 @@ namespace abobaAPP
                 if (MessageBox.Show($"Добавить выбранный вами продукт: '{product.ProductName}' в корзину?", "Добавление в корзину", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
                     SystemContext.bucketList.Add(product);
-                    SystemContext.countInBucket += 1;
                 }
             }
-            if (SystemContext.countInBucket > 0)
+            if (SystemContext.bucketList.Count > 0)
                 myOrdersButton.Visibility = Visibility.Visible;
         }
 
@@ -169,11 +206,6 @@ namespace abobaAPP
             MainWindow mainWindow = new MainWindow();
             this.Close();
             mainWindow.ShowDialog();
-        }
-
-        private void addButton_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void myOrdersButton_Click(object sender, RoutedEventArgs e)
