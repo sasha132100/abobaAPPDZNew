@@ -27,10 +27,6 @@ namespace abobaAPP
             discountComboBox.SelectedItem = "Показать все";
             initializeProducts("No");
             CheckOutCountInOrder();
-            /*if (SystemContext.countInBucket > 0)
-                myOrdersButton.Visibility = Visibility.Visible;
-            else
-                myOrdersButton.Visibility = Visibility.Hidden;*/
             if (!SystemContext.isGuest)
                 userNameTextBlock.Text = SystemContext.user.UserLogin;
             else

@@ -23,8 +23,6 @@ namespace abobaAPP
         public MainWindow()
         {
             InitializeComponent();
-            /*loginBox.Text = "loginDEpxl2018";
-            passwordBox.Text = "P6h4Jq";*/
             loginBox.Text = "loginDEabf2018";
             passwordBox.Text = "*Tasm+";
         }
